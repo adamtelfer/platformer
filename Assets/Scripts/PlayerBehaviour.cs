@@ -34,9 +34,8 @@ public class PlayerBehaviour : MonoBehaviour {
     {
         if (!onlyOneCollision && !CurrentlyBoostJumping())
         {
-            Vector3 direction = (gameObject.transform.position - Col.gameObject.transform.position);
-            direction = direction.normalized;
-            Debug.Log(direction);
+            Vector3 localPosition = this.transform.worldToLocalMatrix.MultiplyPoint(Col.contacts[0].point);
+            Vector3 direction = localPosition.normalized;
             if (Mathf.Abs(direction.x) < edgeBuffer) {
                 physicsRigidBody.velocity = new Vector3(physicsRigidBody.velocity.x, 0, 0); // set y velocity to zero
                 physicsRigidBody.AddForce(new Vector3(0f, bounceForceConstant, 0f)); // some constant force here
