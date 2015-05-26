@@ -31,12 +31,26 @@ public class PlayerBehaviour : MonoBehaviour {
     public float velocityPower = 2f;
     public float scaleVelocityMax;
 
+    public struct CollisionInfo
+    {
+        public bool above, below;
+        public bool left, right;
+
+        public void Reset()
+        {
+            above = below = false;
+            left = right = false;
+        }
+    }
+
+    public CollisionInfo collisions;
 
 	// Use this for initialization
 	void Start () {
         onlyOneCollision = false;
         boostJumping = false;
         startingScale = transform.localScale;
+        collisions.Reset();
 	}
 	
     void BoostFromGround(float scale)
@@ -57,7 +71,7 @@ public class PlayerBehaviour : MonoBehaviour {
         {
             Vector3 localPosition = this.transform.worldToLocalMatrix.MultiplyPoint(Col.contacts[0].point);
             Vector3 direction = localPosition.normalized;
-            if (Mathf.Abs(direction.x) < edgeBuffer)
+            if (Mathf.Abs(direction.x) < edgeBuffer && direction.y <= 0f) // collision bottom
             {
                 BoostFromGround(1f);
             }
