@@ -5,6 +5,7 @@ public class PlayerBehaviour : MonoBehaviour {
 
     public string EnemyTag = "Enemy";
     public string CollectableTag = "Collectable";
+    public string SpringTag = "Spring";
 
     public Transform currentCheckpoint;
 
@@ -73,6 +74,9 @@ public class PlayerBehaviour : MonoBehaviour {
         } else if (string.Compare(col.gameObject.tag,CollectableTag) == 0)
         {
             Destroy(col.gameObject);
+        } else if (string.Compare(col.gameObject.tag,SpringTag) == 0)
+        {
+            BoostFromGround(2.5f);
         }
     }
 
