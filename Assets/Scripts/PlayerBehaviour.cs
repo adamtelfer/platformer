@@ -15,9 +15,10 @@ public class PlayerBehaviour : MonoBehaviour {
     public float edgeBuffer = 0.4f;
 
     public float smashDownForce = 10f;
-    public float velocityHorizontal = 5f;
+    public float horizontalForce = 500f;
+    public float horizontalVelocityMaximum = 7f;
 
-    public bool onlyOneCollision = false;
+    private bool onlyOneCollision = false;
     public bool boostJumping = false;
     public bool isgrounded = false;
 
@@ -96,7 +97,7 @@ public class PlayerBehaviour : MonoBehaviour {
 
     bool CurrentlyBoostJumping()
     {
-        return Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.RightArrow);
+        return InputController.Instance().GetBothPressed();
     }
 
 	// Update is called once per frame
@@ -115,18 +116,41 @@ public class PlayerBehaviour : MonoBehaviour {
                 boostJumping = true;
             }
         }
-        else if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.01f)
+        else if (Mathf.Abs(InputController.Instance().GetHorizontalAxis()) > 0.00f)
         {
-            //physicsRigidBody.AddForce(new Vector3(20f * Input.GetAxis("Horizontal"),0f,0f) * physicsRigidBody.mass);
-
-            physicsRigidBody.velocity = new Vector3(physicsRigidBody.velocity.x * velocityChangeCoeff + (1f-velocityChangeCoeff) * Input.GetAxis("Horizontal") * velocityHorizontal, physicsRigidBody.velocity.y, 0f);
+            physicsRigidBody.AddForce(new Vector3(Time.deltaTime * horizontalForce * InputController.Instance().GetHorizontalAxis(), 0f, 0f)); // some constant force here
         }
+
+        if (physicsRigidBody.velocity.x > horizontalVelocityMaximum) physicsRigidBody.velocity = new Vector3(horizontalVelocityMaximum, physicsRigidBody.velocity.y, 0f);
 	}
 
     void LateUpdate()
     {
-        float yScale = startingScale.y * Mathf.Min(1.0f + Mathf.Pow(Mathf.Abs(physicsRigidBody.velocity.y),velocityPower) * velocityConvertor, scaleVelocityMax);
-        this.transform.localScale = new Vector3(startingScale.x, yScale, startingScale.z);
+        float yScale = startingScale.y;
+        float xScale = startingScale.x;
+
+        this.GetComponent<SpriteRenderer>().color = Color.white;
+
+        if (boostJumping)
+        {
+            yScale = startingScale.y * 0.9f;
+            this.GetComponent<SpriteRenderer>().color = Color.red;
+        }
+        /*else if (collisions.below || collisions.above)
+        {
+            yScale = startingScale.y * 0.5f;
+        }*/
+        else
+        {
+            yScale = startingScale.y * Mathf.Min(1.0f + Mathf.Pow(Mathf.Abs(physicsRigidBody.velocity.y), velocityPower) * velocityConvertor, scaleVelocityMax);
+        }
+        
+        /*if (collisions.left || collisions.right)
+        {
+            xScale = startingScale.x * 0.5f;
+        }*/
+
+        this.transform.localScale = new Vector3(xScale, yScale, startingScale.z);
         onlyOneCollision = false;
     }
 }
