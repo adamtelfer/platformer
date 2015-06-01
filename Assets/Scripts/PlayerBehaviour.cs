@@ -122,6 +122,7 @@ public class PlayerBehaviour : MonoBehaviour {
         }
 
         if (physicsRigidBody.velocity.x > horizontalVelocityMaximum) physicsRigidBody.velocity = new Vector3(horizontalVelocityMaximum, physicsRigidBody.velocity.y, 0f);
+        if (physicsRigidBody.velocity.x < -horizontalVelocityMaximum) physicsRigidBody.velocity = new Vector3(-horizontalVelocityMaximum, physicsRigidBody.velocity.y, 0f);
 	}
 
     void LateUpdate()
@@ -129,12 +130,16 @@ public class PlayerBehaviour : MonoBehaviour {
         float yScale = startingScale.y;
         float xScale = startingScale.x;
 
-        this.GetComponent<SpriteRenderer>().color = Color.white;
+        
+
+        if (InputController.Instance().GetBothPressed())
+        { this.GetComponent<SpriteRenderer>().color = Color.red; }
+        else
+        { this.GetComponent<SpriteRenderer>().color = Color.white; }
 
         if (boostJumping)
         {
             yScale = startingScale.y * 0.9f;
-            this.GetComponent<SpriteRenderer>().color = Color.red;
         }
         /*else if (collisions.below || collisions.above)
         {
